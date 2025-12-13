@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$/../python-utilities">
       <excludeFolder url="file://$MODULE_DIR$/../python-utilities/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.14 (Utilities)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.14 (.venv)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
