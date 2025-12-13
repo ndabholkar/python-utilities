@@ -1,13 +1,14 @@
-Python Utilities — REST Client, News Scraper, Amazon Price Tracker, and File Utilities
+Python Utilities — REST Client, News Scraper, Amazon Price Tracker, File Utilities, and Video Filename Fixer
 
 Overview
 
-This repository provides four small, reusable utilities:
+This repository provides five small, reusable utilities:
 
 - FileUtils — stdlib-only helpers for file IO (text/bytes/JSON/lines), atomic writes, filesystem operations, hashing, and path helpers.
 - RestClient — a lightweight helper for calling REST APIs with all common HTTP methods, query parameters, JSON payloads, and SSL options (requests-based).
 - NewsScraper — a generic news/article scraper that extracts metadata and readable content from web pages, with SSL options (requests + beautifulsoup4).
 - AmazonPriceTracker — a lightweight price tracker that scrapes Amazon product pages to extract price, currency, title, availability, and ASIN. Supports retries, SSL options, and optional JSONL persistence for history (requests + beautifulsoup4).
+- VideoFilenameFixer — a stdlib-only utility for fixing the ordering of offline video tutorial files by renaming them with zero-padded numbers at the start of their filenames.
 
 All utilities are dependency‑light, easy to embed into other projects, and come with unit tests.
 
@@ -55,6 +56,17 @@ AmazonPriceTracker
 - Returns a structured PriceInfo dataclass
 - Optional persistence to JSONL via track(..., persist=True)
 
+VideoFilenameFixer
+
+- Recursively traverses directories to find video files
+- Detects filenames starting with 1-2 digits followed by separators (., space, dash, or combinations)
+- Renames files with 3-digit zero-padded numbers (configurable padding width)
+- Handles all common video file extensions (.mp4, .avi, .mkv, .mov, etc.)
+- Dry-run mode to preview changes without renaming
+- Clear logging of all rename operations
+- Returns structured RenameResult objects for programmatic use
+- No external dependencies (stdlib only)
+
 Project structure
 
 ```
@@ -64,11 +76,13 @@ Project structure
 ├── amazon_price_tracker.py        # AmazonPriceTracker implementation
 ├── news_scraper.py                # NewsScraper implementation
 ├── rest_client.py                 # RestClient implementation
+├── video_filename_fixer.py        # VideoFilenameFixer implementation
 └── tests
     ├── test_amazon_price_tracker.py
     ├── test_file_utils.py
     ├── test_news_scraper.py
-    └── test_rest_client.py
+    ├── test_rest_client.py
+    └── test_video_filename_fixer.py
 ```
 
 Requirements
@@ -76,7 +90,7 @@ Requirements
 - Python 3.8+
 - requests
 - beautifulsoup4 (required for the scrapers: NewsScraper and AmazonPriceTracker)
-- FileUtils uses only the Python standard library (no extra dependencies)
+- FileUtils and VideoFilenameFixer use only the Python standard library (no extra dependencies)
 
 Install dependencies
 
@@ -171,6 +185,53 @@ print(info.to_dict())
 
 # Persist to JSONL for price history
 info = tracker.track(url, persist=True, path="prices_B08N5WRWNW.jsonl")
+```
+
+VideoFilenameFixer
+
+```python
+from video_filename_fixer import VideoFilenameFixer, fix_video_filenames
+
+# Quick usage with the convenience function
+# Preview changes without renaming (dry-run mode)
+results = fix_video_filenames("/path/to/tutorials", dry_run=True)
+
+# Actually rename files recursively
+results = fix_video_filenames("/path/to/tutorials", dry_run=False)
+
+# Using the class for more control
+fixer = VideoFilenameFixer(
+    padding_width=3,  # 3-digit padding (default)
+    dry_run=False,
+    video_extensions={'.mp4', '.avi', '.mkv', '.mov'}  # optional: customize
+)
+
+# Process a directory
+results = fixer.fix_directory(
+    "/path/to/tutorials",
+    recursive=True,  # process subdirectories
+    verbose=True     # print log messages
+)
+
+# Check results programmatically
+for result in results:
+    if result.success:
+        print(f"✓ {result.original_path.name} → {result.new_path.name}")
+    else:
+        print(f"✗ {result.original_path.name}: {result.error_message}")
+
+# Command-line usage
+# python video_filename_fixer.py /path/to/tutorials --dry-run
+# python video_filename_fixer.py /path/to/tutorials
+```
+
+Example transformation:
+```
+Before:                          After:
+1. Introduction.mp4       →      001. Introduction.mp4
+2 - Basics.mp4            →      002 - Basics.mp4
+10 Advanced.mp4           →      010 Advanced.mp4
+42. Expert Level.avi      →      042. Expert Level.avi
 ```
 
 SSL/TLS options
