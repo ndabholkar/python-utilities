@@ -1,16 +1,27 @@
-Python Utilities — REST Client, News Scraper, and Amazon Price Tracker
+Python Utilities — REST Client, News Scraper, Amazon Price Tracker, and File Utilities
 
 Overview
 
-This repository provides three small, reusable utilities built on top of the requests and beautifulsoup4 libraries:
+This repository provides four small, reusable utilities:
 
-- RestClient — a lightweight helper for calling REST APIs with all common HTTP methods, query parameters, JSON payloads, and SSL options.
-- NewsScraper — a generic news/article scraper that extracts metadata and readable content from web pages, with SSL options.
-- AmazonPriceTracker — a lightweight price tracker that scrapes Amazon product pages to extract price, currency, title, availability, and ASIN. Supports retries, SSL options, and optional JSONL persistence for history.
+- FileUtils — stdlib-only helpers for file IO (text/bytes/JSON/lines), atomic writes, filesystem operations, hashing, and path helpers.
+- RestClient — a lightweight helper for calling REST APIs with all common HTTP methods, query parameters, JSON payloads, and SSL options (requests-based).
+- NewsScraper — a generic news/article scraper that extracts metadata and readable content from web pages, with SSL options (requests + beautifulsoup4).
+- AmazonPriceTracker — a lightweight price tracker that scrapes Amazon product pages to extract price, currency, title, availability, and ASIN. Supports retries, SSL options, and optional JSONL persistence for history (requests + beautifulsoup4).
 
-Both components are dependency‑light, easy to embed into other projects, and come with unit tests.
+All utilities are dependency‑light, easy to embed into other projects, and come with unit tests.
 
 Features
+
+FileUtils
+
+- Read/Write: text, bytes, and lines (encoding/newline options)
+- JSON helpers: read_json, write_json (indent/ensure_ascii/sort_keys)
+- Atomic writes: atomic_write_text/bytes/json (same-dir temp + fsync + os.replace)
+- Filesystem ops: exists, is_file, is_dir, size, touch, mkdirs, listdir, glob, remove (missing_ok), rmtree (missing_ok), copy, move, rename
+- Hashing: sha256_file, md5_file (chunked)
+- Path helpers: resolve (relative to optional base_dir), expanduser, ensure_suffix, change_ext
+- Temporary directory: temporary_directory() context manager (yields a Path)
 
 RestClient
 
@@ -49,11 +60,13 @@ Project structure
 ```
 .
 ├── main.py                        # Optional entry point / example (if used)
+├── file_utils.py                  # FileUtils implementation
 ├── amazon_price_tracker.py        # AmazonPriceTracker implementation
 ├── news_scraper.py                # NewsScraper implementation
 ├── rest_client.py                 # RestClient implementation
 └── tests
     ├── test_amazon_price_tracker.py
+    ├── test_file_utils.py
     ├── test_news_scraper.py
     └── test_rest_client.py
 ```
@@ -63,6 +76,7 @@ Requirements
 - Python 3.8+
 - requests
 - beautifulsoup4 (required for the scrapers: NewsScraper and AmazonPriceTracker)
+- FileUtils uses only the Python standard library (no extra dependencies)
 
 Install dependencies
 
@@ -73,6 +87,35 @@ pip install requests beautifulsoup4
 ```
 
 Quick start
+
+FileUtils
+
+```python
+from file_utils import FileUtils
+
+fs = FileUtils(base_dir="./data")
+
+# Text IO
+fs.write_text("notes/todo.txt", "- buy milk\n")
+print(fs.read_text("notes/todo.txt"))
+
+# JSON (atomic)
+cfg = {"env": "dev", "retries": 3}
+fs.atomic_write_json("config/app.json", cfg)
+print(fs.read_json("config/app.json"))
+
+# Filesystem ops and hashing
+fs.mkdirs("outputs")
+fs.copy("config/app.json", "outputs/app-copy.json")
+print(fs.sha256_file("outputs/app-copy.json"))
+
+# Temporary directory
+from pathlib import Path
+with fs.temporary_directory(prefix="tmp_") as td:
+    p = td / "temp.txt"
+    p.write_text("hi", encoding="utf-8")
+    assert p.exists()
+```
 
 RestClient
 
