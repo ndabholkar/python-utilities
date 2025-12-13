@@ -48,7 +48,6 @@ Project structure
 
 ```
 .
-├── guardian_article.json          # Example saved output from NewsScraper
 ├── main.py                        # Optional entry point / example (if used)
 ├── amazon_price_tracker.py        # AmazonPriceTracker implementation
 ├── news_scraper.py                # NewsScraper implementation
