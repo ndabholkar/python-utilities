@@ -11,7 +11,7 @@ except Exception:
     HAS_BS4 = False
 
 if HAS_BS4:
-    from news_scraper import NewsScraper, Article
+    from python_utilities import NewsScraper, Article
 
 
 class DummyResponse:

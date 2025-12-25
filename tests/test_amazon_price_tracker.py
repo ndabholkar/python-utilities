@@ -13,7 +13,7 @@ except Exception:
     HAS_BS4 = False
 
 if HAS_BS4:
-    from amazon_price_tracker import AmazonPriceTracker, PriceInfo
+    from python_utilities import AmazonPriceTracker, PriceInfo
 
 
 class DummyResponse:

@@ -1,6 +1,11 @@
-Python Utilities — REST Client, News Scraper, Amazon Price Tracker, File Utilities, and Video Filename Fixer
+# Python Utilities
 
-Overview
+[![Python Versions](https://img.shields.io/pypi/pyversions/python-utilities.svg)](https://pypi.org/project/python-utilities/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A collection of lightweight, reusable utilities for common Python tasks including file I/O, REST APIs, web scraping, Amazon price tracking, and video file management.
+
+## Overview
 
 This repository provides five small, reusable utilities:
 
@@ -67,45 +72,69 @@ VideoFilenameFixer
 - Returns structured RenameResult objects for programmatic use
 - No external dependencies (stdlib only)
 
-Project structure
+## Installation
 
-```
-.
-├── main.py                        # Optional entry point / example (if used)
-├── file_utils.py                  # FileUtils implementation
-├── amazon_price_tracker.py        # AmazonPriceTracker implementation
-├── news_scraper.py                # NewsScraper implementation
-├── rest_client.py                 # RestClient implementation
-├── video_filename_fixer.py        # VideoFilenameFixer implementation
-└── tests
-    ├── test_amazon_price_tracker.py
-    ├── test_file_utils.py
-    ├── test_news_scraper.py
-    ├── test_rest_client.py
-    └── test_video_filename_fixer.py
+### From PyPI (when published)
+
+```bash
+pip install python-utilities
 ```
 
-Requirements
+### From Source
 
-- Python 3.8+
-- requests
-- beautifulsoup4 (required for the scrapers: NewsScraper and AmazonPriceTracker)
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/python-utilities.git
+cd python-utilities
+
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
+
+# Or install only runtime dependencies
+pip install -e .
+```
+
+## Requirements
+
+- Python 3.8 or higher
+- `requests>=2.28.0` (for RestClient, NewsScraper, AmazonPriceTracker)
+- `beautifulsoup4>=4.11.0` (for NewsScraper, AmazonPriceTracker)
 - FileUtils and VideoFilenameFixer use only the Python standard library (no extra dependencies)
 
-Install dependencies
+## Project Structure
 
-You can install the minimal dependencies directly:
+This project follows modern Python packaging standards (PyPA):
 
 ```
-pip install requests beautifulsoup4
+python-utilities/
+├── src/
+│   └── python_utilities/         # Package directory (src/ layout)
+│       ├── __init__.py           # Package initialization
+│       ├── file_utils.py         # File I/O utilities
+│       ├── rest_client.py        # REST API client
+│       ├── news_scraper.py       # News/article scraper
+│       ├── amazon_price_tracker.py  # Amazon price tracker
+│       ├── video_filename_fixer.py  # Video renaming utility
+│       └── py.typed              # PEP 561 type hints marker
+├── tests/
+│   ├── test_file_utils.py        # FileUtils tests
+│   ├── test_rest_client.py       # RestClient tests
+│   ├── test_news_scraper.py      # NewsScraper tests
+│   ├── test_amazon_price_tracker.py  # Price tracker tests
+│   └── test_video_filename_fixer.py  # Video fixer tests
+├── pyproject.toml                # PEP 621 project metadata
+├── README.md                     # This file
+├── LICENSE                       # MIT License
+├── .gitignore                    # Git ignore patterns
+└── PACKAGING.md                  # Packaging/publishing guide
 ```
 
-Quick start
+## Usage Examples
 
-FileUtils
+### FileUtils
 
 ```python
-from file_utils import FileUtils
+from python_utilities import FileUtils
 
 fs = FileUtils(base_dir="./data")
 
@@ -125,22 +154,23 @@ print(fs.sha256_file("outputs/app-copy.json"))
 
 # Temporary directory
 from pathlib import Path
+
 with fs.temporary_directory(prefix="tmp_") as td:
     p = td / "temp.txt"
     p.write_text("hi", encoding="utf-8")
     assert p.exists()
 ```
 
-RestClient
+### RestClient
 
 ```python
-from rest_client import RestClient
+from python_utilities import RestClient
 
 client = RestClient(
     base_url="https://api.example.com",
     default_headers={"Authorization": "Bearer TOKEN"},
     verify=True,  # or False, or path to a CA bundle
-    cert=None,    # or "/path/to/client.crt" or ("/path/to/cert.crt", "/path/to/key.key")
+    cert=None,  # or "/path/to/client.crt" or ("/path/to/cert.crt", "/path/to/key.key")
 )
 
 # GET with query params
@@ -153,10 +183,10 @@ created = client.post("/v1/items", json_body={"name": "foo"})
 result = client.get("/v1/might-404", raise_for_status=False)  # returns None on 404
 ```
 
-NewsScraper
+### NewsScraper
 
 ```python
-from news_scraper import NewsScraper
+from python_utilities import NewsScraper
 
 scraper = NewsScraper(timeout=15, verify=True)
 article = scraper.scrape("https://example.com/news/some-article")
@@ -171,10 +201,10 @@ print(article.top_image)
 d = article.to_dict()
 ```
 
-AmazonPriceTracker
+### AmazonPriceTracker
 
 ```python
-from amazon_price_tracker import AmazonPriceTracker
+from python_utilities import AmazonPriceTracker
 
 tracker = AmazonPriceTracker(timeout=20, verify=True)
 url = "https://www.amazon.com/dp/B08N5WRWNW"  # replace with your product URL
@@ -187,13 +217,15 @@ print(info.to_dict())
 info = tracker.track(url, persist=True, path="prices_B08N5WRWNW.jsonl")
 ```
 
-VideoFilenameFixer
+### VideoFilenameFixer
 
 ```python
-from video_filename_fixer import VideoFilenameFixer, fix_video_filenames
+from python_utilities import VideoFilenameFixer
+from pathlib import Path
 
 # Quick usage with the convenience function
 # Preview changes without renaming (dry-run mode)
+from python_utilities.video_filename_fixer import fix_video_filenames
 results = fix_video_filenames("/path/to/tutorials", dry_run=True)
 
 # Actually rename files recursively
@@ -210,7 +242,7 @@ fixer = VideoFilenameFixer(
 results = fixer.fix_directory(
     "/path/to/tutorials",
     recursive=True,  # process subdirectories
-    verbose=True     # print log messages
+    verbose=True  # print log messages
 )
 
 # Check results programmatically
@@ -219,13 +251,9 @@ for result in results:
         print(f"✓ {result.original_path.name} → {result.new_path.name}")
     else:
         print(f"✗ {result.original_path.name}: {result.error_message}")
-
-# Command-line usage
-# python video_filename_fixer.py /path/to/tutorials --dry-run
-# python video_filename_fixer.py /path/to/tutorials
 ```
 
-Example transformation:
+**Example transformation:**
 ```
 Before:                          After:
 1. Introduction.mp4       →      001. Introduction.mp4
@@ -234,22 +262,83 @@ Before:                          After:
 42. Expert Level.avi      →      042. Expert Level.avi
 ```
 
-SSL/TLS options
+## Development
 
-All HTTP utilities here (RestClient, NewsScraper, AmazonPriceTracker) expose SSL options like requests does:
+### Setting Up Development Environment
 
-- verify — bool or path to a CA bundle file. Set to False to skip certificate verification (not recommended for production).
-- cert — path to a client certificate, or a (cert, key) tuple.
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/python-utilities.git
+cd python-utilities
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\Activate.ps1
+
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=utilities --cov-report=html
+
+# Run specific test file
+pytest tests/test_file_utils.py
+
+# Run with verbose output
+pytest -v
+```
+
+### Code Quality
+
+```bash
+# Lint with Ruff
+ruff check src/ tests/
+
+# Auto-fix issues
+ruff check --fix src/ tests/
+
+# Format code
+ruff format src/ tests/
+
+# Type check with mypy
+mypy src/
+```
+
+### Building the Package
+
+```bash
+# Install build tool
+pip install build
+
+# Build source distribution and wheel
+python -m build
+
+# Check the distribution
+pip install twine
+twine check dist/*
+```
+
+## SSL/TLS Options
+
+All HTTP utilities (RestClient, NewsScraper, AmazonPriceTracker) expose SSL options like `requests` does:
+
+- **verify** — bool or path to a CA bundle file. Set to False to skip certificate verification (not recommended for production).
+- **cert** — path to a client certificate, or a (cert, key) tuple.
 
 You can set these at the instance level and override them per call/scrape:
 
 ```python
-from rest_client import RestClient
-from news_scraper import NewsScraper
-from amazon_price_tracker import AmazonPriceTracker
+from python_utilities import RestClient, NewsScraper, AmazonPriceTracker
 
-# Create instances (can also be created once and reused)
-client = RestClient(base_url="https://api.example.com")
+# Create instances with SSL options
+client = RestClient(base_url="https://api.example.com", verify=True)
 scraper = NewsScraper(timeout=15, verify=True)
 tracker = AmazonPriceTracker(timeout=20, verify=True)
 
@@ -271,42 +360,62 @@ price = tracker.get_price(
 )
 ```
 
-Running tests
+## Running Tests
 
-This repository uses the standard unittest runner.
+This package uses pytest (modern testing framework):
 
-```
-python -m unittest discover -s tests -v
-```
+```bash
+# Run all tests
+pytest
 
-Notes
+# Run with verbose output
+pytest -v
 
-- RestClient returns None when the response is empty (e.g., 204) or not JSON.
-- NewsScraper prioritizes structured metadata (JSON‑LD, Open Graph). It then falls back to common HTML patterns to assemble content.
-- If beautifulsoup4 is not installed, scraper tests may be skipped; install it to run all tests.
-- AmazonPriceTracker scrapes HTML and can be affected by anti‑bot measures and markup changes. Use realistic headers, backoff on 429/5xx, and consider proxies if appropriate and permitted.
-
-Example: save a scraped article to JSON
-
-```python
-import json
-from news_scraper import NewsScraper
-
-url = "https://www.theguardian.com/world/2025/dec/12/uk-sanctions-four-rsf-commanders-heinous-violence-against-sudan-civilians"
-scraper = NewsScraper(timeout=25, verify=True)
-article = scraper.scrape(url)
-
-with open("guardian_article.json", "w", encoding="utf-8") as f:
-    json.dump(article.to_dict(), f, ensure_ascii=False, indent=2)
+# Run with coverage
+pytest --cov=utilities --cov-report=html
 ```
 
-Troubleshooting
+**Note**: Old unittest-style tests are being migrated to pytest. See [tests/](tests/) directory.
 
-- SSL certificate verify failed — Provide a custom CA bundle via verify="/path/to/ca.pem", or temporarily set verify=False for testing. On macOS, ensure Certificates are up to date.
-- Non‑JSON API responses — RestClient intentionally returns None unless the Content‑Type indicates JSON.
-- Site‑specific scraping edge cases — News websites vary widely. For higher accuracy on a specific site, consider adding a site‑specific parser.
-- Amazon 429/503 or blocks — Reduce request rate, increase backoff, ensure a desktop User‑Agent and Accept‑Language are set (the tracker does this by default), and consider using region‑appropriate proxies where allowed.
+## Why This Structure?
 
-License
+This project follows modern Python packaging standards:
 
-Add your license of choice here (e.g., MIT). If none is provided, all rights reserved by default.
+- **PEP 621**: Project metadata in `pyproject.toml` (replaces setup.py/setup.cfg)
+- **PEP 517/518**: Modern build system with Hatchling
+- **src/ layout**: Package isolation for better testing
+- **py.typed**: Type hint support (PEP 561) for IDE autocomplete and mypy
+- **Modern tooling**: Ruff (linting), pytest (testing), mypy (type checking)
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and add tests
+4. Run tests and linting (`pytest && ruff check`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Built following [PyPA](https://www.pypa.io/) packaging best practices
+- Inspired by the need for lightweight, reusable Python utilities
+- Uses modern Python packaging standards (PEP 621, PEP 517/518, PEP 561)
+
+## Resources
+
+- [Python Packaging User Guide](https://packaging.python.org/)
+- [PEP 621 - Project Metadata](https://peps.python.org/pep-0621/)
+- [requests Documentation](https://docs.python-requests.org/)
+- [Beautiful Soup Documentation](https://www.crummy.com/software/BeautifulSoup/)
+
+## Authors
+
+- Your Name - *Initial work* - [yourusername](https://github.com/yourusername)

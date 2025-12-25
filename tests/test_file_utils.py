@@ -5,7 +5,7 @@ import hashlib
 from pathlib import Path
 import tempfile
 
-from file_utils import FileUtils
+from python_utilities import FileUtils
 
 
 class FileUtilsTest(unittest.TestCase):

@@ -1,0 +1,196 @@
+# pyproject.toml - Modern Python Package Configuration
+# This file follows PEP 621 (Project Metadata) and PEP 517/518 (Build System)
+# https://packaging.python.org/en/latest/specifications/pyproject-toml/
+
+[build-system]
+# PEP 517: Specifies the build backend
+# Hatchling is a modern, standards-compliant build backend from the PyPA
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+# PEP 621: Project Metadata
+name = "python-utilities"
+version = "1.0.0"
+description = "A collection of lightweight, reusable utilities for file I/O, REST APIs, web scraping, and more"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+maintainers = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+keywords = [
+    "utilities",
+    "file-utils",
+    "rest-client",
+    "web-scraping",
+    "amazon-tracker",
+    "helpers",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+
+# Runtime dependencies
+dependencies = [
+    "requests>=2.28.0",
+    "beautifulsoup4>=4.11.0",
+]
+
+[project.optional-dependencies]
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "black>=23.0.0",
+    "types-requests>=2.28.0",
+    "types-beautifulsoup4>=4.11.0",
+]
+
+# Testing dependencies (minimal)
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/python-utilities"
+Repository = "https://github.com/yourusername/python-utilities.git"
+Documentation = "https://github.com/yourusername/python-utilities/blob/main/README.md"
+"Bug Tracker" = "https://github.com/yourusername/python-utilities/issues"
+
+# ============================================================================
+# Tool Configuration
+# ============================================================================
+
+[tool.hatch.build.targets.wheel]
+# Hatchling-specific configuration
+packages = ["src/python_utilities"]
+
+# ============================================================================
+# pytest configuration
+# ============================================================================
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+    "--cov=python_utilities",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+# Add src to Python path for imports
+pythonpath = ["src"]
+
+# ============================================================================
+# Ruff - Modern, fast Python linter (replaces flake8, isort, etc.)
+# https://docs.astral.sh/ruff/
+# ============================================================================
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py38"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# Enable common rule sets
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "N",   # pep8-naming
+    "UP",  # pyupgrade (modernize Python syntax)
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"tests/**/*.py" = [
+    "S101",  # Allow assert in tests
+    "D",     # No docstrings required in tests
+]
+
+[tool.ruff.format]
+# Ruff's formatter (alternative to Black)
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+# ============================================================================
+# Black - Code formatter (alternative to ruff format)
+# ============================================================================
+[tool.black]
+line-length = 120
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+# ============================================================================
+# mypy - Static type checker
+# ============================================================================
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # Set to false for gradual typing
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+mypy_path = "src"
+packages = ["python_utilities"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "bs4.*"
+ignore_missing_imports = true
+
+# ============================================================================
+# Coverage.py
+# ============================================================================
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"

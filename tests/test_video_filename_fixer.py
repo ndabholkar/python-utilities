@@ -2,8 +2,8 @@ import unittest
 from pathlib import Path
 import tempfile
 
-from video_filename_fixer import (
-    VideoFilenameFixer,
+from python_utilities import VideoFilenameFixer
+from python_utilities.video_filename_fixer import (
     fix_video_filenames,
     RenameResult,
     DEFAULT_VIDEO_EXTENSIONS
